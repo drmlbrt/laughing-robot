@@ -153,7 +153,11 @@ with its interface IP address, gateway, and Domain Name System (DNS) server IP a
 The device then obtains the IP address or URL of a TFTP server, and downloads the Python script to configure the device.
 
 ## I guess
+``
 LBD-ISR-E301-01(config)#pnp startup-vlan 990
+``
+
+
 This should be enabled to allow ZTP/PnP on the router through VLAN 990. The default is VLAN 1; which is disabled 
 on this system.
 
