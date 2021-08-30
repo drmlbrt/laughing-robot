@@ -1,33 +1,21 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import cli
+import time
+
+tftp_server = '10.120.202.7'
+cfgfile = "eoip-osw-9300-baseline-cfg_V3.0.cfg"
+destination = 'running-config'
+destinationflash="flash:"
+ios = "cat9k_iosxe.17.03.03.SPA.bin"
 
 def set_managementinterface():
     cli.configurep(["int vlan 990", "ip address dhcp", "end"])
+    time.sleep(60)
     return
 
 def baseline():
-    cli.executep('copy tftp://ip/9K/eoip-osw-9300-baseline-cfg_V3.0.cfg running-config')
+    cli.configurep(["file prompt quiet", "ip tftp blocksize 8192"])
+    cli.executep("copy tftp://%s/%s %s vrf Mgmt-vrf" %(tftp_server, cfgfile, destination))
+    time.sleep(60)
     return
 
 def checkflash():
@@ -45,13 +33,15 @@ def checkflash():
     return
 
 def updateios():
-    cli.executep('copy tftp://ip/9K/cat9k_iosxe.17.03.03.SPA.bin flash:')
+    cli.executep("copy tftp://%s/%s %s vrf Mgmt-vrf" %(tftp_server, ios, destinationflash))
     # is the new version there?
     checkflash()
+    time.sleep(60)
     return
 
 def siteconfig():
     cli.configurep(["hostname ZTP-OSW-UNSET", "end"])
+    time.sleep(10)
     return
 
 def checkversion():
@@ -59,7 +49,7 @@ def checkversion():
     expectedversion = '16.11.01'
     index = version.find(expectedversion)
     if index >=0:
-        print("version is valid for IOS XE 16.11.01")
+        print("---- version is valid for IOS XE 16.11.01")
     else:
         updateios()
     return
