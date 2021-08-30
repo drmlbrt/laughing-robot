@@ -1,4 +1,5 @@
 # laughing-robot
+
 ###zero_touch_provisioning_for_cisco_devices
 
 Laughing Robot is a name proposed by GitHub, per coincidence I rather like it. 
@@ -11,7 +12,9 @@ This intelligence is provided by a Python script that is downloaded via the DHCP
 The script is automating manual procedures.
 
 Basically:
+
 ######ref:
+
 https://developer.cisco.com/docs/ios-xe/#!day-zero-provisioning-quick-start-guide/zero-touch-provisioning-ztp
 
 Code Snippit to start:
@@ -27,11 +30,6 @@ ip dhcp pool ztp_device_pool                            <-- Name of DHCP pool
 
 option 150: tftp server, may be a list of devices
 option 67: location of the script on the tftp server, I think only one ? 
-
-#####DHCP ? 
- 
-
-
 
 ###Script
 First, remember that the python terminal is opened first. That is what I understood of the documentation. 
@@ -76,6 +74,7 @@ The basic script I would like to have should:
 - verification configuration
 
 ###The Switch
+
 Basic Version out of the box:
 ````commandline
 Cisco IOS XE Software, Version 16.11.01
@@ -83,7 +82,9 @@ Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Versi
 #The Switch Hardware# May differ depending on the delivery
 Model Number                       : C9300-24U
 ````
+
 ####Enabling the guestshell
+
 ````commandline
 LBD-DIS-9300-01#guestshell run python
  iox feature is not enabled
@@ -145,6 +146,7 @@ write erase
 reload
    ---> answer no when it asks you to save configuration ! 
 ````
+
 ##What should happen
 
 When a device that supports Zero-Touch Provisioning boots up, and does not find the startup configuration (during fresh install on Day Zero), 
@@ -153,6 +155,7 @@ with its interface IP address, gateway, and Domain Name System (DNS) server IP a
 The device then obtains the IP address or URL of a TFTP server, and downloads the Python script to configure the device.
 
 ## I guess
+
 ``
 LBD-ISR-E301-01(config)#pnp startup-vlan 990
 ``
