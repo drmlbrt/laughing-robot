@@ -32,6 +32,7 @@ option 150: tftp server, may be a list of devices
 option 67: location of the script on the tftp server, I think only one ? 
 
 ###Script
+
 First, remember that the python terminal is opened first. That is what I understood of the documentation. 
 What happens, the switch boots up until it reaches the automated prompt : do you like to configure the devices with the wizard yes/no
 Also, it is a basic terminal on the switch. So you can't import Python Modules. This depends on your company security restrictions.
@@ -42,6 +43,7 @@ a dhcp address.
 Inside the DHCP there are two options (150&67) that connect and download the script.
 
 Example script:
+
 ````buildoutcfg
 print "\n\n *** Sample ZTP Day0 Python Script *** \n\n"
 
@@ -60,7 +62,8 @@ print "\n\n *** Executing show ip interface brief *** \n\n"
 print "\n\n *** ZTP Day0 Python Script Execution Complete *** \n\n"
 ````
 The fact is, it opens the python inside the switch. 
->Question: is this Python 3.0?
+
+>Question: is this Python 3.0? :> Not it isn't , its version 2.7!
 
 ###Replacing the man 
 
@@ -76,6 +79,7 @@ The basic script I would like to have should:
 ###The Switch
 
 Basic Version out of the box:
+
 ````commandline
 Cisco IOS XE Software, Version 16.11.01
 Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.11.1, RELEASE SOFTWARE (fc3)
@@ -83,7 +87,9 @@ Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Versi
 Model Number                       : C9300-24U
 ````
 
-####Enabling the guestshell
+###Playing With the GuestShell in another Switch!
+
+####Enabling the Guestshell
 
 ````commandline
 LBD-DIS-9300-01#guestshell run python
@@ -99,7 +105,9 @@ IOx service (HA)     : Running
 IOx service (IOxman) : Running
 Libvirtd             : Running
 ````
+
 You need to enable a 'virtual interface' on the device. Found this on the whitepapers.
+
 ````commandline
 LBD-DIS-9300-01#guestshell enable
 Interface will be selected if configured in app-hosting
@@ -125,11 +133,11 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 
 ````
+
 Look at the default. Python 2.7.5
 The documentation says that Python 3 is present on the device. I wonder? 
-Answer = NOT
+Answer = NOT : running the guestshell with python3 did not work.
 
-Let's start with sketching.
 
 ###Enabling ZTP on a pre-configured switch - LAB env.
 
@@ -165,21 +173,16 @@ This should be enabled to allow ZTP/PnP on the router through VLAN 990. The defa
 on this system.
 
 And... magic.
-After the weekend I stumbled upon this: %Error opening tftp://10.120.202.12//9K/python_script.py (Time
-Bad path from me, and the tftp server was offline. 
+After the weekend I stumbled upon this: %Error opening tftp://10.120.202.12//9K/python_script.py (
+Bad path from me, and the tftp server was offline. However, error means that the dhcp was ok!
 
-After correction:
+After correction: Changing the syntax to the older Python2.7 and adding changes to the TFTP configuration 
+on the device. Error what is underneath is provoked by a waiting CLI user input. That is not what the zero touch will do.
+
 
 ````commandline
 Would you like to enter the initial configuration dialog? [yes/no]: guestshell installed successfully
-Current state is: DEPLOYED
-guestshell activated successfully
-Current state is: ACTIVATED
-guestshell started successfully
-Current state is: RUNNING
-Guestshell enabled successfully
-
-
+... ommitted...
 HTTP server statistics:
 Accepted connections total: 0  File "/bootflash/downloaded_script.py", line 10
     cli.executep(f"copy tftp://{ip}/eoip-osw-9300-baseline-cfg_V3.0.cfg running-config ")
@@ -187,8 +190,7 @@ Accepted connections total: 0  File "/bootflash/downloaded_script.py", line 10
 SyntaxError: invalid syntax
 ````
 
-So I made the script in Python 3.0 syntax. I remembered that the Python Shell starts in default 2.7. How to solve this?
-After changing the script syntax:
+After changing the CLI tftp commands (look inside the python script for details.):
 
 ````commandline
 Current state is: DEPLOYED
@@ -228,5 +230,7 @@ Perfect.
 In the end, the only limits are your scripting talents. 
 It has proven that with little setup you can run the ZeroTouch Provisioning without any issues. 
 
+Last but not least, I can logon, however issues with SSH, but those are out of scope ! 
+Thank you, and have funn with this feature.
 
 
