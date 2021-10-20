@@ -59,17 +59,21 @@ def get_facts():
 
 def installguestshellnetworking():
     device_facts = get_facts()
-    print("\n####----------------INSTALLING THE GUESTSHELL NETWORKING CONFIGURATION --------###")
+    print("\n####----------------INSTALLING THE GUESTSHELL NETWORKING CONFIGURATION --------------###")
     subnet = [i for i in device_facts["Vlan990_ip"].split(".")]
     vlan990_subnet = (subnet[2])
-    cli.configure(["app-hosting appid guestshell",
-                   "app-vnic AppGigabitEthernet trunk",
-                   "vlan 990 guest-interface 0",
-                   "guest-ipaddress 10.242.%s.10 netmask 255.255.255.192" % (vlan990_subnet),
-                   "app-default-gateway 10.242.%s.1 guest-interface 0" % (vlan990_subnet),
-                   "name-server0 10.8.69.33"])
-    print("\n####-------FINISHED INSTALLING THE GUESTSHELL NETWORKING CONFIGURATION --------###")
-    return
+    try:
+        cli.configure(["app-hosting appid guestshell",
+                       "app-vnic AppGigabitEthernet trunk",
+                       "vlan 990 guest-interface 0",
+                       "guest-ipaddress 10.242.%s.10 netmask 255.255.255.192" % (vlan990_subnet),
+                       "app-default-gateway 10.242.%s.1 guest-interface 0" % (vlan990_subnet),
+                       "name-server0 10.8.69.33"])
+        print("\n####-------FINISHED INSTALLING THE GUESTSHELL NETWORKING CONFIGURATION --------------###")
+    except Exception as e:
+        # Print any error messages to stdout
+        print(e)
+        return
 
 
 def confirminstallation():
@@ -89,21 +93,6 @@ def confirminstallation():
         return
 
 
-def toolbar():
-    toolbar_width = 86
-    # setup toolbar
-    sys.stdout.write("[%s]" % (" " * toolbar_width))
-    sys.stdout.flush()
-    sys.stdout.write("\b" * (toolbar_width + 1))  # return to start of line, after '['
-    for i in range(toolbar_width):
-        time.sleep(0.05)  # do real work here
-        # update the bar
-        sys.stdout.write("#")
-        sys.stdout.flush()
-    sys.stdout.write("]\n")  # this ends the progress bar
-    return
-
-
 def download(*args, destination):
     while True:
         try:
@@ -112,11 +101,9 @@ def download(*args, destination):
                 print("\n----#### BEGINNING TRANSFER FOR %s FILE ####----" % (file))
                 cli.executep("copy http://%s/9K/%s %s" % (file_server, file, destination))
                 time.sleep(0.2)
-                toolbar()
                 print("\n----#### TRANSFER %s FILE OK ####----" % (file))
                 if file == str(tarfile):
                     cli.executep("archive tar /xtract flash:Tcl.tar flash:")
-                    toolbar()
                 return
         except:
             print("\n----#### TRANSFER %s FILE *FAILED* ####----" % (file))
@@ -124,17 +111,20 @@ def download(*args, destination):
 
 
 def monitoring():
-    print("\n---- Configuring SNMP settings")
+    print("\n----####  Configuring SNMP settings")
     time.sleep(0.5)
-    cli.configurep(["ip access-list standard ACL_SNMP", "permit 10.0.0.0 0.255.255.255"])
-    cli.configurep(["snmp-server group SNMP_GROUP_READ v3 priv",
-                    "snmp-server trap-source Vlan990",
-                    "snmp-server source-interface informs Vlan990",
-                    "snmp-server contact CCVC TechBu Deployed Networks",
-                    "snmp-server user SNMP_USER_READ SNMP_GROUP_READ v3 auth SHA *** priv AES 128 *** access ACL_SNMP"
-                    ])
-    toolbar()
-    return
+    try:
+        cli.configurep(["ip access-list standard ACL_SNMP", "permit 10.0.0.0 0.255.255.255"])
+        cli.configurep(["snmp-server group SNMP_GROUP_READ v3 priv",
+                        "snmp-server trap-source Vlan990",
+                        "snmp-server source-interface informs Vlan990",
+                        "snmp-server contact CCVC TechBu Deployed Networks",
+                        "snmp-server user SNMP_USER_READ SNMP_GROUP_READ v3 auth SHA *** priv AES 128 *** access ACL_SNMP"
+                        ])
+    except Exception as e:
+        # Print any error messages to stdout
+        print(e)
+        return
 
 
 def checkflash():
@@ -173,7 +163,6 @@ def baseline():
     cli.configurep(["file prompt quiet", "ip tftp blocksize 1468"])
     cli.configurep(["crypto key generate rsa label KP_SSH mod 2048"])
     cli.configurep(["alias exec EOIPpy guestshell run python /flash/eoip.py"])
-    toolbar()
     time.sleep(0.2)
     download(cfgfile, eoipfile, destination=destination)
     download(tarfile, destination=destinationflash)
@@ -187,8 +176,9 @@ def baseline():
     except Exception as e:
         # Print any error messages to stdout
         print(e)
-        print("\n####--------------- EMAIL ERROR )> EMAIL NOT SEND ----------------------------###")
+        print("\n####------------------- EMAIL ERROR )> EMAIL NOT SEND -------------------------------###")
     return
+
 
 def main():
     print('\n####---- Switch Baseline Install ----------------------------------------------------###')
@@ -196,7 +186,7 @@ def main():
     print('\n####---- Preparing email with device facts switch -----------------------------------###')
     cli.execute('copy running-config startup-config')
     print('\n####---- Device Installation with Zero Touch Finished -------------------------------###')
-    print('\n####---- There is no shame in doing a WRITE MEM  :-)  -------------------------------###')
+    print('\n####---- There is no shame in doing a COPY RUN START  :-)  --------------------------###')
     return
 
 
