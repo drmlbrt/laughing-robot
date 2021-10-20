@@ -104,20 +104,6 @@ def toolbar():
     return
 
 
-def snmp():
-    print("\n---- Configuring SNMP settings")
-    time.sleep(0.5)
-    cli.configurep(["ip access-list standard ACL_SNMP", "permit 10.0.0.0 0.255.255.255"])
-    cli.configurep(["snmp-server group SNMP_GROUP_READ v3 priv",
-                    "snmp-server trap-source Vlan990",
-                    "snmp-server source-interface informs Vlan990",
-                    "snmp-server contact CCVC TechBu Deployed Networks",
-                    "snmp-server user SNMP_USER_READ SNMP_GROUP_READ v3 auth SHA SNMPPASS priv AES 256 SNMPPASS access ACL_SNMP"
-                    ])
-    toolbar()
-    return
-
-
 def download(*args, destination):
     while True:
         try:
@@ -145,7 +131,7 @@ def monitoring():
                     "snmp-server trap-source Vlan990",
                     "snmp-server source-interface informs Vlan990",
                     "snmp-server contact CCVC TechBu Deployed Networks",
-                    "snmp-server user SNMP_USER_READ SNMP_GROUP_READ v3 auth SHA SNMPPASS priv AES 128 SNMPPASS access ACL_SNMP"
+                    "snmp-server user SNMP_USER_READ SNMP_GROUP_READ v3 auth SHA *** priv AES 128 *** access ACL_SNMP"
                     ])
     toolbar()
     return
