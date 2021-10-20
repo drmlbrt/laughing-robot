@@ -142,17 +142,48 @@ Answer = NOT : running the guestshell with python3 did not work.
 ###Enabling ZTP on a pre-configured switch - LAB env.
 
 ````commandline
-configure terminal
-    no pnp profile pnp-zero-touch
-    crypto key zeroize
-    no crypto pki certificate pool
-    end
-delete /force vlan.dat
-delete /force nvram:*.cer
-delete /force stby-nvram:*.cer
-write erase
-reload
-   ---> answer no when it asks you to save configuration ! 
+alias exec prep4pnp event manager run prep4pnp
+!alias exec show-pov-version event manager run show-pov-version
+!
+no event manager applet prep4pnp
+event manager applet prep4pnp
+event none sync yes
+action a1010 syslog msg "Start: 'prep4pnp' EEM applet."
+action a1020 puts "Preparing device to be discovered by device automation. Note: This script will reboot the device."
+action b1010 cli command "enable"
+action b1020 puts "Stopping pnp for now"
+action b1030 cli command "no pnp profile pnp-zero-touch"
+action b1040 puts "Saving config to update BOOT param."
+action b1040 cli command "write"
+action c1010 puts "Erasing startup-config."
+action c1020 cli command "write erase" pattern "confirm"
+action c1030 cli command "y"
+action c1031 puts "this was write erase"
+action c1040 puts "Erasing startup-config."
+action c1050 cli command ”write erase" pattern "confirm"
+action c1060 cli command "y"
+action c1061 puts "this was erase startup"
+action d1010 puts "Clearing crypto keys."
+action d1020 cli command "config t"
+action d1030 cli command "crypto key zeroize" pattern "yes/no"
+action d1040 cli command "y"
+action e1010 puts "Clearing crypto PKI stuff."
+action e1020 cli command "no crypto pki cert pool" pattern "yes/no"
+action e1030 cli command "y"
+action e1040 cli command "exit"
+action f1010 puts "Deleting vlan.dat file."
+action f1020 cli command "delete /force vlan.dat"
+action g1010 puts "Deleting certificate files in NVRAM."
+action g1020 cli command "delete /force nvram:*.cer"
+action h0001 puts "Deleting PnP files"
+action h0010 cli command "delete /force flash:pnp*"
+action h0020 cli command "delete /force nvram:pnp*"
+action z1010 puts "Device is prepared for being discovered by device automation. Rebooting."
+action z1020 syslog msg "Stop: 'prep4pnp' EEM applet."
+action z1030 reload
+!
+!
+end
 ````
 
 ##What should happen
