@@ -1,6 +1,7 @@
 """
 This is a python script where I tried to use the netmask logic to find the network, first and last host.
 In a second venture I added 'subnet' calculation
+27-10-21 new_branch add new-feature subnetting based on hosts
 """
 
 
@@ -156,7 +157,7 @@ def wildcard_mask(subnetmask):
     return convert_to_decimal(flippedwildcard)
 
 
-class Subnetter:
+class Subnetfinder:
 
     number_of_bits = 32
 
@@ -253,6 +254,18 @@ class Subnetter:
         return f"This is your address in the class {self.octet1}.{self.octet2}.{self.octet3}.{self.octet4}/{self.network_bits}"
 
 
+class Subnet_On_Hosts(Subnetfinder):
+    def __init__(self, address, hosts):
+        super().__init__(address)
+        self.hosts = hosts #Should be a list of hosts from biggest to lowest
+
+    def __str__(self):
+        return f"{super().__str__()} : {self.hosts} provided for sunetting, for network"
+
+    def hosts(self, *hosts):
+        #here i probably need the ip-address and the provide 'large' enough subnet mask
+        #provide a list of 'hosts' , per group of hosts create a subnet
+
 address = input("What IP Address - Subnet would you like to calculate?: ip/cidr => ")
-calculate_address = Subnetter.ip_address(address)
+calculate_address = Subnetfinder.ip_address(address)
 calculate_address.find_network()
