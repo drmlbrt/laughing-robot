@@ -8,7 +8,6 @@ from email.mime.multipart import MIMEMultipart
 import json
 import io
 
-
 file_server = '10.15.255.52'
 smtp_server = "10.8.145.37"
 cfgfile = "baseline.cfg"
@@ -36,8 +35,8 @@ def check_if_info_in_file(file_name, info_to_search):
 def get_facts():
     facts = {
         "Vlan990_ip": "",
-             "Version": "",
-             "Hostname": ""
+        "Version": "",
+        "Hostname": ""
     }
     hostname = cli.execute('sh run | i hostname')
     vlan990 = cli.execute('show ip interface brief | i Vlan990')
@@ -79,7 +78,7 @@ def installguestshellnetworking():
 def confirminstallation():
     my_file = io.StringIO()
     device_facts = get_facts()
-    filename = "%s-%s.cfg" %(n,device_facts["Vlan990_ip"])
+    filename = "%s-%s.cfg" % (n, device_facts["Vlan990_ip"])
     try:
         my_file.write("=====================================================")
         my_file.write("This is an Auto generated ZeroTouchInstallation file:")
@@ -140,19 +139,19 @@ def checkflash():
     return
 
 
-def updateios():
-    version = cli.execute('show version')
-    expectedversion = '17.03.03'
-    index = version.find(expectedversion)
-    if index >= 0:
-        print("----#### version is valid for IOS XE %s" % (expectedversion))
-    else:
-        cli.execute("install remove inactive")
-        cli.configure("boot system flash:packages.conf")
-        download(ios, destination=destinationflash)
-        checkflash()
-        cli.execute("install add file flash:%s activate commit" % (ios))
-    return
+# def updateios():
+#     version = cli.execute('show version')
+#     expectedversion = '17.03.03'
+#     index = version.find(expectedversion)
+#     if index >= 0:
+#         print("----#### version is valid for IOS XE %s" % (expectedversion))
+#     else:
+#         cli.execute("install remove inactive")
+#         cli.configure("boot system flash:packages.conf")
+#         download(ios, destination=destinationflash)
+#         checkflash()
+#         cli.execute("install add file flash:%s activate commit" % (ios))
+#     return
 
 
 def baseline():
@@ -169,7 +168,7 @@ def baseline():
     print("\n----#### Starting Monitoring Installation-------------------------------------------------###")
     monitoring()
     print("\n----#### Starting Update IOS Installation-------------------------------------------------###")
-    updateios()
+    # updateios()
     try:
         confirminstallation()
         return
